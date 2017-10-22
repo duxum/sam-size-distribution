@@ -1,0 +1,6 @@
+[package]
+name = "sized"
+version = "0.1.0"
+authors = ["duxum <duxduxum@gmail.com>"]
+
+[dependencies]
