@@ -1,6 +1,4 @@
-use std::ops::Index;
 use std::collections::HashMap;
-
 
 
 
@@ -30,9 +28,7 @@ impl<'a> polality<'a>{
 		mismatch.insert(0, polality.clone()); mismatch.insert(1, polality.clone());
 		mismatch.insert(2, polality.clone()); mismatch.insert(3, polality.clone());
 		polality{ data: mismatch}
-		
 	}
-
 }
 
 
@@ -65,20 +61,16 @@ impl<'a> Sam<'a>{
 		println!("{:?}" ,self.positive);
 		println!("{:?}", self.positive);
 
-
 	}
 
 	pub fn process_line(&mut self, line:&String){
 		let results:Vec<&str> = line.split("\t").collect();
 		if results.len()<=12{
-		//	println!("Passed here");
 			return ();
 		}
-	//	println!("Not threr");
                 let sequence = results[9].as_bytes();
                 let current_nucleotide_size = sequence.len();
                 if !self.has(&current_nucleotide_size){
-//                        println!("\n{} is not present ", current_nucleotide_size);
                         self.add(&current_nucleotide_size);
                 }
                 let polality = results[1].parse::<usize>().unwrap();
@@ -89,13 +81,8 @@ impl<'a> Sam<'a>{
                 if polality == 0 || polality ==256{
 			let nucleotide_of_interest = sequence[0];
 			if polality ==0{
-				//println!("{:?}", self);
-				//println!("Nucleotide:{}, Mismatch: {}, Available Nucleotides: {:?}", nucleotide_of_interest as char, polality, self.nucleotides);
-                       		//print!("{:?}", self.positive.get_mut(&current_nucleotide_size).unwrap().data.get_mut(&polality).unwrap().get_mut("single").unwrap().get_mut(&nucleotide_of_interest).unwrap().0);
                        		self.positive.get_mut(&current_nucleotide_size).unwrap().data.get_mut(&mismatch).unwrap().get_mut("single").unwrap().get_mut(&nucleotide_of_interest).unwrap().0+=1;
                        		self.positive.get_mut(&current_nucleotide_size).unwrap().data.get_mut(&mismatch).unwrap().get_mut("single").unwrap().get_mut(&nucleotide_of_interest).unwrap().1+=abundance;
-				//println!("");
-				//return
 			}else{
                        		self.positive.get_mut(&current_nucleotide_size).unwrap().data.get_mut(&mismatch).unwrap().get_mut("multiple").unwrap().get_mut(&nucleotide_of_interest).unwrap().0+=1;
                        		self.positive.get_mut(&current_nucleotide_size).unwrap().data.get_mut(&mismatch).unwrap().get_mut("multiple").unwrap().get_mut(&nucleotide_of_interest).unwrap().1+=abundance;
@@ -103,10 +90,6 @@ impl<'a> Sam<'a>{
 		}else{
 			let nucleotide_of_interest = sequence[current_nucleotide_size-1];
 			if polality ==16{
-//				println!("First Column is {:?} Nucleotide:{}, Mismatch: {}, Available Nucleotides: {:?}", first_column, nucleotide_of_interest as char, mismatch, self.nucleotides);
-  //                     		print!("{:?}\n", self.negative.get_mut(&current_nucleotide_size).unwrap().data.get_mut(&mismatch).unwrap());
-//				println!("Results is {:?}", results);
-                       		//print!("{:?}", self.negative.get_mut(&current_nucleotide_size).unwrap().data.get_mut(&mismatch).unwrap().get_mut("single").unwrap().get_mut(&nucleotide_of_interest).unwrap().0);
                        		self.negative.get_mut(&current_nucleotide_size).unwrap().data.get_mut(&mismatch).unwrap().get_mut("single").unwrap().get_mut(&nucleotide_of_interest).unwrap().0+=1;
                        		self.negative.get_mut(&current_nucleotide_size).unwrap().data.get_mut(&mismatch).unwrap().get_mut("single").unwrap().get_mut(&nucleotide_of_interest).unwrap().1+=abundance;
 			}else{
