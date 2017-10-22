@@ -16,7 +16,7 @@ fn read_files(file_name: &String) -> std::io::Result<()>{
 		let line = line.unwrap();
 		current_sam.process_line(&line);
 	}
-	current_sam.write_for_excel();
+	println!("{}", current_sam);
 	println!("");
 	return Ok(());
 

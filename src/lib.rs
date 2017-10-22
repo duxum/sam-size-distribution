@@ -1,6 +1,10 @@
 use std::collections::HashMap;
 use std::fmt;
 
+static NUCLEOTIDES:&[u8] = &[65, 71, 67, 84]; //AGCT
+static S_OR_M: &[&str] = &["single", "multiple"];
+static MISMATCH: &[usize] = &[0, 1, 2, 3];
+
 #[derive(Debug)]
 pub struct polality<'a>{
 	data: HashMap<usize, HashMap<&'a str, HashMap<u8, Stored>>>
@@ -25,8 +29,8 @@ impl<'a> polality<'a>{
 		mismatch.insert(2, polality.clone()); mismatch.insert(3, polality.clone());
 		polality{ data: mismatch}
 	}
-	fn query(&mut self, mismatch:&usize, s_or_m:&str, nucleotide:&u8) -> &mut Stored {
-		self.data.get_mut(&mismatch).unwrap().get_mut(s_or_m).unwrap().get_mut(nucleotide).unwrap()
+	fn query(&self, mismatch:&usize, s_or_m:&str, nucleotide:&u8) -> & Stored {
+		self.data.get(&mismatch).unwrap().get(s_or_m).unwrap().get(nucleotide).unwrap()
 	} 
 	fn query_mut(&mut self, mismatch:&usize, s_or_m:&str, nucleotide:&u8) -> &mut Stored {
 		self.data.get_mut(&mismatch).unwrap().get_mut(s_or_m).unwrap().get_mut(nucleotide).unwrap()
@@ -35,7 +39,14 @@ impl<'a> polality<'a>{
 
 impl<'a> fmt::Display for polality<'a>{
 	fn fmt(&self, f:&mut fmt::Formatter) -> fmt::Result{
-		write!(f, "Called");
+		for mismatch in MISMATCH.iter(){
+			for s_or_m in S_OR_M.iter(){
+				for nucleotide in NUCLEOTIDES.iter(){
+						write!(f, "{},{},", self.query(&mismatch, &s_or_m, &nucleotide).0, self.query(&mismatch, &s_or_m, &nucleotide).1);
+				}
+			}
+	
+		}
 		Ok(())
 	}
 	
@@ -106,24 +117,55 @@ impl<'a> Sam<'a>{
                       	 	self.negative.get_mut(&current_nucleotide_size).unwrap().data.get_mut(&mismatch).unwrap().get_mut("multiple").unwrap().get_mut(&nucleotide_of_interest).unwrap().0+1;
                        		self.negative.get_mut(&current_nucleotide_size).unwrap().data.get_mut(&mismatch).unwrap().get_mut("multiple").unwrap().get_mut(&nucleotide_of_interest).unwrap().1+=abundance;
 				}
-		}
-
+		}	
 	}
 
 
 
 
 	pub fn write_for_excel(&self){
-		println!("{}", self.name);
-		println!("Positive");
-		println!("0,,,,,,,,1,,,,,,,,2,,,,,,,,3,,,,,,,,");
-		println!("A,,G,,C,,T,,A,,G,,C,,T,,A,,G,,C,,T,,A,,G,,C,,T,,");
-		println!("Unique,Abund,Unique,Abund,Unique,Abund,Unique,Abund,Unique,Abund,Unique,Abund,Unique,Abund,Unique,Abund,Unique,Abund,Unique,Abund,Unique,Abund,Unique,Abund,Unique,Abund,Unique,Abund,Unique,Abund,Unique,Abund,");
+		//for i in self.nucleotides.iter(){
+	//		println!("For 20 {}", self.negative[&20])
+		//}
+		//println!("Positive");
+		let mut first = true;
+		for current in [&self.positive, &self.negative].iter(){
+			if first{ println!("Positive");} else{ println!("Negative"); };
+			first = false;
+			println!("0,,,,,,,,,,,,,,,,1,,,,,,,,,,,,,,,,2,,,,,,,,,,,,,,,,3,,,,,,,,,,,,,,,,");
+			println!("Single,,,,,,,,Multiple,,,,,,,,Single,,,,,,,,Multiple,,,,,,,,Single,,,,,,,,Multiple,,,,,,,,Single,,,,,,,,Multiple,,,,,,,,");
+			println!("A,,G,,C,,T,,A,,G,,C,,T,,A,,G,,C,,T,,A,,G,,C,,T,,A,,G,,C,,T,,A,,G,,C,,T,,A,,G,,C,,T,,A,,G,,C,,T,,");
+			println!("Unique,Abund,Unique,Abund,Unique,Abund,Unique,Abund,Unique,Abund,Unique,Abund,Unique,Abund,Unique,Abund,Unique,Abund,Unique,Abund,Unique,Abund,Unique,Abund,Unique,Abund,Unique,Abund,Unique,Abund,Unique,Abund,Unique,Abund,Unique,Abund,Unique,Abund,Unique,Abund,Unique,Abund,Unique,Abund,Unique,Abund,Unique,Abund,Unique,Abund,Unique,Abund,Unique,Abund,Unique,Abund,Unique,Abund,Unique,Abund,Unique,Abund,Unique,Abund,");
+			for nucleotide in  self.nucleotides.iter(){
+				println!("{}\n", current[nucleotide]);
+			}
+			println!("\n\n\n\n\n");
+		}
 
 	}
 	
 }
 
+
+
+
+impl<'a> fmt::Display for Sam<'a>{
+	fn fmt(&self, f:&mut fmt::Formatter) -> fmt::Result{
+		let mut first = false;
+		for current in [&self.positive, &self.negative].iter(){
+			if first{ write!(f, "Positive");} else{ write!(f, "Negative"); };
+			first = false;
+			write!(f, "0,,,,,,,,,,,,,,,,1,,,,,,,,,,,,,,,,2,,,,,,,,,,,,,,,,3,,,,,,,,,,,,,,,,");
+			write!(f, "Single,,,,,,,,Multiple,,,,,,,,Single,,,,,,,,Multiple,,,,,,,,Single,,,,,,,,Multiple,,,,,,,,Single,,,,,,,,Multiple,,,,,,,,");
+			write!(f, "A,,G,,C,,T,,A,,G,,C,,T,,A,,G,,C,,T,,A,,G,,C,,T,,A,,G,,C,,T,,A,,G,,C,,T,,A,,G,,C,,T,,A,,G,,C,,T,,");
+			write!(f, "Unique,Abund,Unique,Abund,Unique,Abund,Unique,Abund,Unique,Abund,Unique,Abund,Unique,Abund,Unique,Abund,Unique,Abund,Unique,Abund,Unique,Abund,Unique,Abund,Unique,Abund,Unique,Abund,Unique,Abund,Unique,Abund,Unique,Abund,Unique,Abund,Unique,Abund,Unique,Abund,Unique,Abund,Unique,Abund,Unique,Abund,Unique,Abund,Unique,Abund,Unique,Abund,Unique,Abund,Unique,Abund,Unique,Abund,Unique,Abund,Unique,Abund,Unique,Abund,");
+			for nucleotide in  self.nucleotides.iter(){
+				write!(f, "{}\n", current[nucleotide]);
+			}
+		}	
+	Ok(())
+	}
+}
 
 #[cfg(test)]
 mod tests {
