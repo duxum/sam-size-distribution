@@ -1,5 +1,9 @@
 [package]
+<<<<<<< HEAD
 name = "sized"
+=======
+name = "rnanalysis"
+>>>>>>> d730f5db7ad2223c5870a69ba6c2f616861dc4c8
 version = "0.1.0"
 authors = ["duxum <duxduxum@gmail.com>"]
 
