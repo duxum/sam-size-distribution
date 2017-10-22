@@ -1,14 +1,10 @@
 use std::collections::HashMap;
-
-
-
+use std::fmt;
 
 #[derive(Debug)]
 pub struct polality<'a>{
 	data: HashMap<usize, HashMap<&'a str, HashMap<u8, Stored>>>
 }
-
-
 
 #[derive(Clone, Debug)]
 struct Stored(usize, usize);
@@ -29,9 +25,21 @@ impl<'a> polality<'a>{
 		mismatch.insert(2, polality.clone()); mismatch.insert(3, polality.clone());
 		polality{ data: mismatch}
 	}
+	fn query(&mut self, mismatch:&usize, s_or_m:&str, nucleotide:&u8) -> &mut Stored {
+		self.data.get_mut(&mismatch).unwrap().get_mut(s_or_m).unwrap().get_mut(nucleotide).unwrap()
+	} 
+	fn query_mut(&mut self, mismatch:&usize, s_or_m:&str, nucleotide:&u8) -> &mut Stored {
+		self.data.get_mut(&mismatch).unwrap().get_mut(s_or_m).unwrap().get_mut(nucleotide).unwrap()
+	} 
 }
 
-
+impl<'a> fmt::Display for polality<'a>{
+	fn fmt(&self, f:&mut fmt::Formatter) -> fmt::Result{
+		write!(f, "Called");
+		Ok(())
+	}
+	
+}
 #[derive(Debug)]
 pub struct Sam<'a>{
 	name: &'a String,
@@ -81,8 +89,10 @@ impl<'a> Sam<'a>{
                 if polality == 0 || polality ==256{
 			let nucleotide_of_interest = sequence[0];
 			if polality ==0{
-                       		self.positive.get_mut(&current_nucleotide_size).unwrap().data.get_mut(&mismatch).unwrap().get_mut("single").unwrap().get_mut(&nucleotide_of_interest).unwrap().0+=1;
-                       		self.positive.get_mut(&current_nucleotide_size).unwrap().data.get_mut(&mismatch).unwrap().get_mut("single").unwrap().get_mut(&nucleotide_of_interest).unwrap().1+=abundance;
+                       		//self.positive.get_mut(&current_nucleotide_size).unwrap().data.get_mut(&mismatch).unwrap().get_mut("single").unwrap().get_mut(&nucleotide_of_interest).unwrap().0+=1;
+				self.positive.get_mut(&current_nucleotide_size).unwrap().query_mut(&mismatch, "single", &nucleotide_of_interest).0+=1;
+				self.positive.get_mut(&current_nucleotide_size).unwrap().query_mut(&mismatch, "single", &nucleotide_of_interest).1+=abundance;
+                       		//self.positive.get_mut(&current_nucleotide_size).unwrap().data.get_mut(&mismatch).unwrap().get_mut("single").unwrap().get_mut(&nucleotide_of_interest).unwrap().1+=abundance;
 			}else{
                        		self.positive.get_mut(&current_nucleotide_size).unwrap().data.get_mut(&mismatch).unwrap().get_mut("multiple").unwrap().get_mut(&nucleotide_of_interest).unwrap().0+=1;
                        		self.positive.get_mut(&current_nucleotide_size).unwrap().data.get_mut(&mismatch).unwrap().get_mut("multiple").unwrap().get_mut(&nucleotide_of_interest).unwrap().1+=abundance;
@@ -97,6 +107,18 @@ impl<'a> Sam<'a>{
                        		self.negative.get_mut(&current_nucleotide_size).unwrap().data.get_mut(&mismatch).unwrap().get_mut("multiple").unwrap().get_mut(&nucleotide_of_interest).unwrap().1+=abundance;
 				}
 		}
+
+	}
+
+
+
+
+	pub fn write_for_excel(&self){
+		println!("{}", self.name);
+		println!("Positive");
+		println!("0,,,,,,,,1,,,,,,,,2,,,,,,,,3,,,,,,,,");
+		println!("A,,G,,C,,T,,A,,G,,C,,T,,A,,G,,C,,T,,A,,G,,C,,T,,");
+		println!("Unique,Abund,Unique,Abund,Unique,Abund,Unique,Abund,Unique,Abund,Unique,Abund,Unique,Abund,Unique,Abund,Unique,Abund,Unique,Abund,Unique,Abund,Unique,Abund,Unique,Abund,Unique,Abund,Unique,Abund,Unique,Abund,");
 
 	}
 	
