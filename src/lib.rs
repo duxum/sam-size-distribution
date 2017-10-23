@@ -1,4 +1,7 @@
 use std::collections::HashMap;
+use std::io::prelude::*;
+use std::io::{BufReader, BufWriter};
+use std::fs::File;
 use std::fmt;
 
 static NUCLEOTIDES:&[u8] = &[65, 71, 67, 84]; //AGCT
@@ -15,6 +18,7 @@ struct Stored(usize, usize);
 
 
 impl<'a> polality<'a>{
+
 	fn new(size: usize) -> polality<'a>{
 		let mut initials = Stored(0, 0);
 		let mut nucleotide_handling = HashMap::new();
@@ -45,23 +49,31 @@ impl<'a> fmt::Display for polality<'a>{
 						write!(f, "{},{},", self.query(&mismatch, &s_or_m, &nucleotide).0, self.query(&mismatch, &s_or_m, &nucleotide).1);
 				}
 			}
-	
 		}
 		Ok(())
 	}
 	
 }
+
 #[derive(Debug)]
 pub struct Sam<'a>{
 	name: &'a String,
 	nucleotides: Vec<usize>,
 	pub positive: HashMap<usize, polality<'a>>,
 	pub negative: HashMap<usize, polality<'a>>,
-	
-
 }
 
 impl<'a> Sam<'a>{
+	pub fn process(&mut self)->Result<(), &str>{
+		let mut file = File::open(self.name).unwrap();
+       		let mut buf_reader = BufReader::new(&file);
+        	for line in buf_reader.lines(){
+                	let line = line.unwrap();
+               		self.process_line(&line);
+        	}
+        	println!("");
+		Ok(())
+	}
 	pub fn new(name: &String ) -> Sam{
 		Sam{name: name, nucleotides: Vec::new(), positive: HashMap::new(), negative: HashMap::new()}
 	}
@@ -82,7 +94,7 @@ impl<'a> Sam<'a>{
 
 	}
 
-	pub fn process_line(&mut self, line:&String){
+	fn process_line(&mut self, line:&String){
 		let results:Vec<&str> = line.split("\t").collect();
 		if results.len()<=12{
 			return ();
@@ -124,10 +136,6 @@ impl<'a> Sam<'a>{
 
 
 	pub fn write_for_excel(&self){
-		//for i in self.nucleotides.iter(){
-	//		println!("For 20 {}", self.negative[&20])
-		//}
-		//println!("Positive");
 		let mut first = true;
 		for current in [&self.positive, &self.negative].iter(){
 			if first{ println!("Positive");} else{ println!("Negative"); };
